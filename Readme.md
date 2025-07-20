@@ -8,9 +8,7 @@ This project was developed during a research internship at DRDO (PXE) in 2025. R
 - Multiple ML models tested and compared (Logistic Regression, Decision Tree, CatBoost etc.)
 
 ## 🛠️ Tech Stack
-- Python
-- Jupyter Notebook
-- Scikit-learn, Pandas, Matplotlib, Seaborn
+- Python, Flask, CatBoost, pandas, NumPy, seaborn, matplotlib, HTML
 
 ## 📊 Results
 - Achieved ~85% accuracy on classification models
@@ -18,4 +16,3 @@ This project was developed during a research internship at DRDO (PXE) in 2025. R
 
 ##  Team
 This was a collaborative project done with 4 members during our internship.
-
