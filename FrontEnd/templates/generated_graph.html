@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apsara Weather Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-bg: #0f1524;
+            --main-bg: #001856;
+            --card-bg: rgba(94, 122, 220, 0.5);
+            --text-primary: white;
+            --accent-color: #5c3ee8;
+            --icon-color: #4a5568;
+            --toggle-bg: #1a1f2f;
+            --glass-border: rgba(255, 255, 255, 0.18);
+        }
+
+        [data-theme="light"] {
+            --sidebar-bg: #f0f0f0;
+            --main-bg: #ffffff;
+            --card-bg: rgba(240, 240, 240, 0.9);
+            --text-primary: #000000;
+            --accent-color: #5c3ee8;
+            --icon-color: #666666;
+            --toggle-bg: #e0e0e0;
+            --glass-border: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--main-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 64px;
+            min-width: 64px;
+            /* Prevent width collapse */
+            overflow: hidden;
+            /* Contain all child elements */
+            background-color: var(--sidebar-bg);
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .toggle-btn {
+            width: 40px;
+            height: 24px;
+            background: var(--toggle-bg);
+            border-radius: 999px;
+            padding: 2px;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            /* Prevent button shrinkage */
+        }
+
+        .toggle-circle {
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            /* Added vertical alignment */
+            transition: transform 0.3s;
+        }
+
+        [data-theme="light"] .toggle-circle {
+            transform: translateX(16px);
+            /* Adjusted translation */
+            background: var(--accent-color);
+        }
+
+        .icon-button {
+            color: var(--icon-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        .icon-button:hover {
+            color: var(--text-primary);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 2rem;
+            margin-bottom: 32px;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(9px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        select {
+            background: white;
+            border: none;
+            border-radius: 16px;
+            padding: 8px 16px;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .param-label {
+            font-size: 0.6rem;
+            /* Smaller font size */
+            line-height: 1.1;
+            color: white;
+            margin: 0;
+            word-break: break-word;
+            /* Allow text wrapping */
+            max-width: 40px;
+            /* Constrain text width */
+        }
+
+        .param-label-description {
+            font-size: 0.6rem;
+            /* Smaller font size */
+            line-height: 1.1;
+            color: white;
+            margin: 0;
+            margin-left: 1rem;
+        }
+
+        [data-theme="light"] .param-label-description {
+            color: #0f1524;
+        }
+
+        .generate-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 24px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s;
+        }
+
+        .generate-btn:hover {
+            opacity: 0.9;
+        }
+
+
+
+        /* Active State */
+        .active-icon {
+            background: #5c3ee8;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            /* Added gap between icon and text */
+        }
+
+        .active-icon i {
+            color: white;
+            font-size: 1.5rem;
+            /* Adjusted icon size */
+        }
+
+        .active-text {
+            font-size: 0.75rem;
+            color: white;
+            /* Changed to white for better contrast */
+            text-align: center;
+            /* Ensure text alignment */
+            line-height: 1.2;
+        }
+
+        /* Active State */
+        .active-icon {
+            background: #5c3ee8;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+        }
+
+        .active-icon i {
+            color: white;
+        }
+
+        .active-text {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .graph-image {
+            width: 100%;
+            height: 400px;
+            object-fit: contain;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
+            background-color: var(--image-bg);
+        }
+    </style>
+</head>
+
+<body data-theme="dark">
+    <aside class="sidebar">
+        <button class="toggle-btn" onclick="toggleTheme()">
+            <div class="toggle-circle"></div>
+        </button>
+
+        <button class="icon-button" data-page="dashboard">
+            <i class="fas fa-bolt"></i>
+        </button>
+
+        <button class="icon-button" data-page="clean">
+            <i class="fas fa-chart-line"></i>
+        </button>
+        </button>
+
+        <button class="icon-button" data-page="raw">
+            <i class="fas fa-chart-area"></i>
+        </button>
+
+        <div style="margin-left: 10px;margin-right: 10px;" class="active-icon">
+            <i class="fas fa-chart-pie"></i>
+            <span class="active-text">Report Generator</span>
+        </div>
+
+
+        <button class="icon-button" data-page="model">
+            <i class="fas fa-brain"></i>
+        </button>
+        <button class="icon-button" data-page="documentation">
+            <i class="fas fa-book-open"></i>
+        </button>
+        <button class="icon-button" data-page="group">
+            <i class="fas fa-info"></i>
+        </button>
+    </aside>
+
+    <main class="main-content">
+        <h1 class="title">Month Wise Report Generator</h1>
+
+        <form action="/generated-graph" method="post">
+            <div class="form-grid">
+                <div class="glass-card">
+                    <select aria-label="Month" id="month" name="month">
+                        <option selected>Month</option>
+                        <option value="1">JAN</option>
+                        <option value="2">FEB</option>
+                        <option value="3">MAR</option>
+                        <option value="4">APR</option>
+                        <option value="5">MAY</option>
+                        <option value="6">JUN</option>
+                        <option value="7">JUL</option>
+                        <option value="8">AUG</option>
+                        <option value="9">SEP</option>
+                        <option value="10">OCT</option>
+                        <option value="11">NOV</option>
+                        <option value="12">DEC</option>
+                    </select>
+                    <p class="param-label-description">JAN-DEC</p>
+                </div>
+
+                <div class="glass-card">
+                    <select aria-label="Year" id="year" name="year">
+                        <option selected>Year</option>
+                        <option value="2008">2008</option>
+                        <option value="2009">2009</option>
+                        <option value="2010">2010</option>
+                        <option value="2011">2011</option>
+                        <option value="2012">2012</option>
+                        <option value="2013">2013</option>
+                        <option value="2014">2014</option>
+                        <option value="2015">2015</option>
+                        <option value="2016">2016</option>
+                        <option value="2017">2017</option>
+                    </select>
+                    <p class="param-label-description">2008-2017</p>
+                </div>
+
+                <div class="glass-card">
+                    <select aria-label="parameter" id="parameter" name="parameter">
+                        <option selected>Parameter</option>
+                        <option value="MinTemp">MinTemp</option>
+                        <option value="MaxTemp">MaxTemp</option>
+                        <option value="Rainfall">Rainfall</option>
+                        <option value="Evaporation">Evaporation</option>
+                        <option value="Sunshine">Sunshine</option>
+                        <option value="WindGustSpeed">WindGustSpeed</option>
+                        <option value="WindSpeed9am">WindSpeed9am</option>
+                        <option value="WindSpeed3pm">WindSpeed3pm</option>
+                        <option value="Humidity9am">Humidity9am</option>
+                        <option value="Humidity3pm">Humidity3pm</option>
+                        <option value="Pressure3pm">Pressure3pm</option>
+                        <option value="Cloud9am">Cloud9am</option>
+                        <option value="Cloud3pm">Cloud3pm</option>
+                        <option value="Temp9am">Temp9am</option>
+                        <option value="Temp3pm">Temp3pm</option>
+                    </select>
+                    <p class="param-label-description">Choose Parameter</p>
+                </div>
+
+                <button class="generate-btn">
+                    Generate
+                </button>
+            </div>
+        </form>
+        <div class="flex justify-center">
+            {% for graph in graphs %}
+            <img class="graph-image" src="data:image/png;base64,{{ graph }}" alt="Graph"
+                style="width: 1000px; height: 450px; margin: 20px;" />
+            {% endfor %}
+        </div>
+    </main>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+        }
+    </script>
+    <script>
+        // Add navigation handler
+        function handleNavigation(page) {
+            const routes = {
+                dashboard: '/',
+                clean: '/cleaned-data-analysis',
+                raw: '/raw-data-analysis',
+                report: '/generate',
+                model: '/model-details',
+                documentation: '/documentation',
+                group: '/group'
+            };
+
+            if (routes[page]) {
+                window.location.href = routes[page];
+            }
+        }
+
+        // Attach click handlers
+        document.querySelectorAll('.icon-button[data-page]').forEach(button => {
+            button.addEventListener('click', function () {
+                handleNavigation(this.dataset.page);
+            });
+        });
+    </script>
+</body>
+
+</html>

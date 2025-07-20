@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apsara Weather Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --sidebar-bg: #ffffff;
+      --icon-color: #4a5568;
+      --iframe-border: #1a1f2f;
+      --sidebar-border: #e2e8f0;
+      /* New border variable */
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #121827;
+      --text-color: #ffffff;
+      --sidebar-bg: #1a1f2f;
+      --icon-color: #a0aec0;
+      --iframe-border: #4a5568;
+      --sidebar-border: #2d3748;
+      /* Dark mode border */
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 4rem;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border);
+      /* Added border */
+      padding: 1.5rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    /* ... (keep other styles the same as before) ... */
+
+    /* Active State */
+    .active-icon {
+      background: #5c3ee8;
+      padding: 0.75rem;
+      border-radius: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      /* Added gap between icon and text */
+    }
+
+    .active-icon i {
+      color: white;
+      font-size: 1.5rem;
+      /* Adjusted icon size */
+    }
+
+    .active-text {
+      font-size: 0.75rem;
+      color: white;
+      /* Changed to white for better contrast */
+      text-align: center;
+      /* Ensure text alignment */
+      line-height: 1.2;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #121827;
+      --text-color: #ffffff;
+      --sidebar-bg: #1a1f2f;
+      --icon-color: #a0aec0;
+      --iframe-border: #4a5568;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 4rem;
+      background-color: var(--sidebar-bg);
+      padding: 1.5rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .toggle-button {
+      width: 2.5rem;
+      height: 1.5rem;
+      background: #1a1f2f;
+      border-radius: 999px;
+      padding: 0.2rem;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .toggle-circle {
+      width: 1rem;
+      height: 1rem;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    [data-theme="dark"] .toggle-circle {
+      transform: translateX(100%);
+    }
+
+
+    [data-theme="light"] {
+      --sidebar-bg: #f0f0f0;
+      --main-bg: #ffffff;
+      --card-bg: rgba(240, 240, 240, 0.9);
+      --text-primary: #000000;
+      --accent-color: #5c3ee8;
+      --icon-color: #666666;
+      --toggle-bg: #e0e0e0;
+      --glass-border: rgba(0, 0, 0, 0.1);
+    }
+
+    .icon-button {
+      color: var(--icon-color);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.25rem;
+    }
+
+    .icon-button:hover {
+      color: var(--text-color);
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      flex: 1;
+      padding: 1.5rem;
+      overflow: auto;
+    }
+
+    .model-title {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .iframe-container {
+      width: 90%;
+      height: 90%;
+      margin: 0 auto;
+      border: 1px solid var(--iframe-border);
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+
+    .iframe-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Active State */
+    .active-icon {
+      background: #5c3ee8;
+      padding: 0.75rem;
+      border-radius: 0.75rem;
+    }
+
+    .active-icon i {
+      color: white;
+    }
+
+    .active-text {
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+
+<body data-theme="dark">
+  <aside class="sidebar">
+    <button class="toggle-button" onclick="toggleTheme()">
+      <div class="toggle-circle"></div>
+    </button>
+
+    <button class="icon-button" data-page="dashboard">
+      <i class="fas fa-bolt"></i>
+    </button>
+    <button class="icon-button" data-page="clean">
+      <i class="fas fa-chart-line"></i>
+    </button>
+    <button class="icon-button" data-page="raw">
+      <i class="fas fa-chart-area"></i>
+    </button>
+    <button class="icon-button" data-page="report">
+      <i class="fas fa-chart-pie"></i>
+    </button>
+
+    <button class="icon-button" data-page="model">
+      <i class="fas fa-brain"></i>
+    </button>
+
+    <div style="margin-left: 10px;margin-right: 10px;" class="active-icon">
+      <i class="fas fa-book-open"></i>
+      <span class="active-text">Docs</span>
+    </div>
+    <button class="icon-button" data-page="group">
+      <i class="fas fa-info"></i>
+    </button>
+  </aside>
+
+  <main class="main-content">
+    <h1>PAGE UNDER CONSTRUCTION</h1>
+  </main>
+
+  <script>
+    function toggleTheme() {
+      const body = document.body;
+      const currentTheme = body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      body.setAttribute('data-theme', newTheme);
+    }
+  </script>
+
+  <script>
+    // Add navigation handler
+    function handleNavigation(page) {
+      const routes = {
+        dashboard: '/',
+        clean: '/cleaned-data-analysis',
+        raw: '/raw-data-analysis',
+        report: '/generate',
+        model: '/model-details',
+        documentation: '/documentation',
+        group: '/group'
+      };
+
+      if (routes[page]) {
+        window.location.href = routes[page];
+      }
+    }
+
+    // Attach click handlers
+    document.querySelectorAll('.icon-button[data-page]').forEach(button => {
+      button.addEventListener('click', function () {
+        handleNavigation(this.dataset.page);
+      });
+    });
+  </script>
+</body>
+
+</html>

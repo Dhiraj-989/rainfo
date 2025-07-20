@@ -1,0 +1,661 @@
+<html lang="en">
+
+<head>
+   <meta charset="utf-8" />
+   <meta content="width=device-width, initial-scale=1" name="viewport" />
+   <title>
+      DROP Weather Dashboard
+   </title>
+   <script src="https://cdn.tailwindcss.com"></script>
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet" />
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+   <style>
+      :root {
+         --sidebar-bg: #0f1524;
+         --main-bg: #121827;
+         --accent-color: #5c3ee8;
+         --input-bg: #1a1f2f;
+         --text-primary: white;
+         --glass-bg: rgba(94, 122, 220, 0.5);
+         --glass-border: rgba(255, 255, 255, 0.18);
+      }
+
+      [data-theme="light"] {
+         --sidebar-bg: #f0f0f0;
+         --main-bg: #ffffff;
+         --input-bg: #e0e0e0;
+         --text-primary: #000000;
+         --glass-bg: rgba(240, 240, 240, 0.9);
+         --glass-border: rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+         margin: 0;
+         padding: 0;
+         box-sizing: border-box;
+         font-family: 'Inter', sans-serif;
+         transition: all 0.3s;
+      }
+
+      body {
+         background: var(--main-bg) url('https://images4.alphacoders.com/135/1355525.png') no-repeat center/cover;
+         color: var(--text-primary);
+         min-height: 100vh;
+         padding-left: 64px;
+      }
+
+      /* Sidebar */
+      .sidebar {
+         position: fixed;
+         left: 0;
+         top: 0;
+         width: 64px;
+         height: 100vh;
+         background: var(--sidebar-bg);
+         padding: 24px 0;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         gap: 32px;
+         z-index: 1000;
+      }
+
+      .toggle-btn {
+         width: 40px;
+         height: 24px;
+         background: var(--input-bg);
+         border-radius: 999px;
+         padding: 2px;
+         cursor: pointer;
+         position: relative;
+      }
+
+      .toggle-circle {
+         width: 16px;
+         height: 16px;
+         background: white;
+         border-radius: 50%;
+         position: absolute;
+         left: 2px;
+         top: 2px;
+         transition: transform 0.3s;
+      }
+
+      [data-theme="light"] .toggle-circle {
+         transform: translateX(16px);
+         background: var(--accent-color);
+      }
+
+      .icon-btn {
+         color: #4a5568;
+         background: none;
+         border: none;
+         cursor: pointer;
+         font-size: 1.25rem;
+      }
+
+      .icon-btn:hover {
+         color: var(--text-primary);
+      }
+
+      .active-icon {
+         background: var(--accent-color);
+         padding: 12px;
+         border-radius: 12px;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         gap: 8px;
+      }
+
+      .active-text {
+         font-size: 0.6rem;
+         color: white;
+         text-align: center;
+         line-height: 1.2;
+         max-width: 48px;
+      }
+
+      /* Main Content */
+      .main-content {
+         padding: 24px;
+         max-width: 1600px;
+         margin: 0 auto;
+      }
+
+      .top-bar {
+         display: flex;
+         justify-content: space-between;
+         margin-bottom: 40px;
+      }
+
+      .search-form {
+         display: flex;
+         align-items: center;
+         background: var(--input-bg);
+         border-radius: 999px;
+         padding: 8px 16px;
+         width: 100%;
+         max-width: 500px;
+      }
+
+      .search-input {
+         background: transparent;
+         border: none;
+         color: var(--text-primary);
+         margin-left: 12px;
+         width: 100%;
+      }
+
+      .user-menu {
+         display: flex;
+         align-items: center;
+         background: var(--input-bg);
+         border-radius: 999px;
+         padding: 8px 16px;
+         gap: 12px;
+      }
+
+      .user-avatar {
+         width: 32px;
+         height: 32px;
+         background: var(--accent-color);
+         border-radius: 50%;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+      }
+
+      /* Prediction Section */
+      .prediction-card {
+         background: var(--glass-bg);
+         backdrop-filter: blur(9px);
+         border: 1px solid var(--glass-border);
+         border-radius: 20px;
+         padding: 32px;
+         margin-bottom: 40px;
+      }
+
+      .input-grid {
+         display: grid;
+         grid-template-columns: repeat(2, 1fr);
+         gap: 24px;
+         margin-bottom: 32px;
+      }
+
+      .input-field {
+         background: white;
+         border-radius: 20px;
+         padding: 16px;
+         text-align: center;
+         border: none;
+         width: 100%;
+      }
+
+      .predict-btn {
+         background: var(--accent-color);
+         color: white;
+         border: none;
+         border-radius: 999px;
+         padding: 16px 32px;
+         font-size: 1.25rem;
+         cursor: pointer;
+         display: flex;
+         align-items: center;
+         gap: 12px;
+      }
+
+      .result-box {
+         background: #4a5568;
+         padding: 24px;
+         border-radius: 12px;
+         text-align: center;
+         font-size: 1.25rem;
+         margin-left: 24px;
+      }
+
+      /* Analysis Cards */
+      .analysis-grid {
+         display: grid;
+         grid-template-columns: repeat(2, 1fr);
+         gap: 24px;
+      }
+
+      .analysis-card {
+         background: var(--glass-bg);
+         backdrop-filter: blur(9px);
+         border: 1px solid var(--glass-border);
+         border-radius: 20px;
+         padding: 24px;
+         min-height: 200px;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         justify-content: center;
+      }
+   </style>
+
+   <style>
+      body {
+         font-family: 'Inter', sans-serif;
+      }
+   </style>
+</head>
+
+<body class="bg-[url(https://images4.alphacoders.com/135/1355525.png)] bg-cover text-white min-h-screen flex">
+   <!-- Sidebar -->
+   <aside class="sidebar">
+      <button class="toggle-btn" onclick="toggleTheme()">
+         <div class="toggle-circle"></div>
+      </button>
+      <div class="active-icon">
+         <i class="fas fa-bolt"></i>
+         <span class="active-text">Rain Predictor</span>
+      </div>
+      <button class="icon-btn" data-page="clean">
+         <i class="fas fa-chart-line"></i>
+      </button>
+      <button class="icon-btn" data-page="raw">
+         <i class="fas fa-chart-area"></i>
+      </button>
+      <button class="icon-btn" data-page="report">
+         <i class="fas fa-chart-pie"></i>
+      </button>
+      <button class="icon-btn" data-page="model">
+         <i class="fas fa-brain"></i>
+      </button>
+      <button class="icon-btn" data-page="documentation">
+         <i class="fas fa-book-open"></i>
+      </button>
+      <button class="icon-btn" data-page="group">
+         <i class="fas fa-info"></i>
+      </button>
+   </aside>
+   <!-- Main content -->
+   <main class="flex-1 p-6 space-y-6">
+      <!-- Top bar -->
+      <div class="flex justify-between items-center">
+
+         <button aria-label="User menu"
+            class="flex items-center space-x-3 bg-[#121827] rounded-full px-4 py-2 max-w-[180px]">
+            <div class="w-8 h-8 rounded-full bg-[#5c3ee8] flex items-center justify-center text-white text-lg">
+               <i class="fas fa-home">
+               </i>
+            </div>
+            <span class="text-sm">
+               DROP
+            </span>
+         </button>
+      </div>
+      <!-- Weather & Forecast Section -->
+      <section class="flex flex-col lg:flex-row gap-6">
+         <!-- Left big card -->
+         <div style="background: rgba( 94, 122, 220, 0.5 );
+               box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+               backdrop-filter: blur( 9px );
+               -webkit-backdrop-filter: blur( 9px );
+               border-radius: 10px;
+               border: 1px solid rgba( 255, 255, 255, 0.18 );"
+            class="bg-[#121827] rounded-2xl p-6 flex-1 max-w-4xl flex flex-col justify-between relative background: rgba( 255, 255, 255, 0.2 );">
+            <div class="flex justify-between items-start">
+               <form>
+                  <div>
+                     <button aria-label="Rainfall Predictor"
+                        class="inline-flex items-center space-x-2 bg-[#5c3ee8] rounded-full px-5 py-2 text-white text-sm font-medium mb-4">
+                        <i class="fas fa-solid fa-cube"></i>
+                        </i>
+                        <span>
+                           Rainfall Predictor
+                        </span>
+                     </button>
+                     <div class="flex mt-6">
+                        <h2 class="text-2xl font-semibold mb-1">
+                           <input class="w-3/4 rounded-2xl text-black text-center p-4" name="Rainfall" id="Rainfall"
+                              type="number" placeholder="Rainfall"></input>
+                        </h2>
+                        <h2 class="text-2xl font-semibold mb-1">
+                           <input class="w-3/4 rounded-2xl text-black text-center p-4" name="Humidity3pm"
+                              id="Humidity3pm" type="number" placeholder="Humidity3pm"></input>
+                        </h2>
+                     </div>
+                     <div class="flex mt-6">
+                        <h2 class="text-2xl font-semibold mb-1">
+                           <input class="w-3/4 rounded-2xl text-black text-center p-4" name="Humidity9am"
+                              id="Humidity9am" type="number" placeholder="Humidity9am"></input>
+                        </h2>
+                        <h2 class="text-2xl font-semibold mb-1">
+                           <input class="w-3/4 rounded-2xl text-black text-center p-4" name="Sunshine" id="Sunshine"
+                              type="number" placeholder="Sunshine"></input>
+                        </h2>
+                     </div>
+                     <div class="flex mt-6">
+                        <h2 class="text-2xl font-semibold mb-1">
+                           <input class="w-3/4 rounded-2xl text-black text-center p-4" name="MinTemp" id="MinTemp"
+                              type="number" placeholder="MinTemp"></input>
+                        </h2>
+                        <h2 class="text-2xl font-semibold mb-1">
+                           <input class="w-3/4 rounded-2xl text-black text-center p-4" name="Pressure9am"
+                              id="Pressure9am" type="number" placeholder="Pressure9am"></input>
+                        </h2>
+                     </div>
+                     <div class="flex mt-6">
+                        <h2 class="text-2xl font-semibold mb-1">
+                           <input class="w-3/4 rounded-2xl text-black text-center p-4" name="Pressure3pm"
+                              id="Pressure3pm" type="number" placeholder="Pressure3pm"></input>
+                        </h2>
+                        <h2 class="text-2xl font-semibold mb-1">
+                           <input class="w-3/4 rounded-2xl text-black text-center p-4" name="WindGustSpeed"
+                              id="WindGustSpeed" type="number" placeholder="WindGustSpeed"></input>
+                        </h2>
+                     </div>
+
+                     <!-- <div class="flex mt-6">
+                           <h2 class="text-2xl font-semibold mb-1 w-[10px]">
+                                 <button id="predict_button" aria-label="Predict Button"
+                                 class=" bg-[#5c3ee8] w-3/4 rounded-2xl text-black text-center p-4">
+                              Predict
+                              </button>
+                           </h2>
+                           <h2 class="text-2xl font-semibold mb-1">
+                              <input class="w-3/4 rounded-2xl text-black text-center p-4" name="WindGustSpeed"
+                                 id="WindGustSpeed" type="number" placeholder="WindGustSpeed"></input>
+                           </h2>
+                        </div> -->
+
+                     <div class="mt-6 flex justify-between items-center space-x-6">
+                        <!-- Left Section: Big Button -->
+                        <div class="flex-1 flex justify-center">
+                           <button id="predict_button" aria-label="Predict Button"
+                              class="inline-flex items-center space-x-2 bg-[#5c3ee8] rounded-full px-10 py-4 text-white text-lg font-semibold shadow-lg">
+                              <i class="fas fa-cloud-rain"></i>
+                              <span>Predict</span>
+                           </button>
+                        </div>
+                        <!-- Right Section: HELLO -->
+                        <div id="rainStatus"
+                           class="flex-1 w-2/3 ml-[150px] mr-[100px] bg-gray-600 p-9 rounded-lg text-center text-lg font-medium"
+                           style="
+    margin-left: 155px;
+    margin-right: 90px;
+">
+                        </div>
+                     </div>
+                  </div>
+               </form>
+            </div>
+
+         </div>
+         <!-- Right highlight & other cities -->
+         <div style="background: rgba( 94, 122, 220, 0.5 );
+               box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+               backdrop-filter: blur( 9px );
+               -webkit-backdrop-filter: blur( 9px );
+               border-radius: 10px;
+               border: 1px solid rgba( 255, 255, 255, 0.18 );" class="flex flex-col flex-1 max-w-3xl space-y-6">
+            <!-- Today Highlight -->
+            <div class="rounded-2xl p-6 grid grid-cols-2 gap-6">
+               <h3 class="col-span-2 text-lg font-normal mb-4">
+                  Exploratory Data Analysis
+               </h3>
+               <div style="background: rgba( 94, 122, 220, 0.5 );
+                     box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+                     backdrop-filter: blur( 9px );
+                     -webkit-backdrop-filter: blur( 9px );
+                     border-radius: 10px;
+                     border: 1px solid rgba( 255, 255, 255, 0.18 );"
+                  class="bg-[#1a1f2f] rounded-xl p-2 min-h-[120px] flex flex-col justify-center items-center space-y-4">
+                  <a href="/cleaned-data-analysis">
+                  <p class="text-sm font-normal">
+                     Cleaned Data Analysis
+                  </p>
+                  </a>
+
+                  <a href="/download/final_cleaned_data.csv" class="w-12 h-12">
+                     <img alt="svgImg"
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciICB2aWV3Qm94PSIwIDAgNDggNDgiIHdpZHRoPSI0OHB4IiBoZWlnaHQ9IjQ4cHgiPjxwYXRoIGZpbGw9IiMxNjkxNTQiIGQ9Ik0yOSw2SDE1Ljc0NEMxNC43ODEsNiwxNCw2Ljc4MSwxNCw3Ljc0NHY3LjI1OWgxNVY2eiIvPjxwYXRoIGZpbGw9IiMxODQ4MmEiIGQ9Ik0xNCwzMy4wNTR2Ny4yMDJDMTQsNDEuMjE5LDE0Ljc4MSw0MiwxNS43NDMsNDJIMjl2LTguOTQ2SDE0eiIvPjxwYXRoIGZpbGw9IiMwYzgwNDUiIGQ9Ik0xNCAxNS4wMDNIMjlWMjQuMDA1MDAwMDAwMDAwMDAzSDE0eiIvPjxwYXRoIGZpbGw9IiMxNzQ3MmEiIGQ9Ik0xNCAyNC4wMDVIMjlWMzMuMDU1SDE0eiIvPjxnPjxwYXRoIGZpbGw9IiMyOWMyN2YiIGQ9Ik00Mi4yNTYsNkgyOXY5LjAwM2gxNVY3Ljc0NEM0NCw2Ljc4MSw0My4yMTksNiw0Mi4yNTYsNnoiLz48cGF0aCBmaWxsPSIjMjc2NjNmIiBkPSJNMjksMzMuMDU0VjQyaDEzLjI1N0M0My4yMTksNDIsNDQsNDEuMjE5LDQ0LDQwLjI1N3YtNy4yMDJIMjl6Ii8+PHBhdGggZmlsbD0iIzE5YWM2NSIgZD0iTTI5IDE1LjAwM0g0NFYyNC4wMDUwMDAwMDAwMDAwMDNIMjl6Ii8+PHBhdGggZmlsbD0iIzEyOTY1MiIgZD0iTTI5IDI0LjAwNUg0NFYzMy4wNTVIMjl6Ii8+PC9nPjxwYXRoIGZpbGw9IiMwYzcyMzgiIGQ9Ik0yMi4zMTksMzRINS42ODFDNC43NTMsMzQsNCwzMy4yNDcsNCwzMi4zMTlWMTUuNjgxQzQsMTQuNzUzLDQuNzUzLDE0LDUuNjgxLDE0aDE2LjYzOCBDMjMuMjQ3LDE0LDI0LDE0Ljc1MywyNCwxNS42ODF2MTYuNjM4QzI0LDMzLjI0NywyMy4yNDcsMzQsMjIuMzE5LDM0eiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik05LjgwNyAxOUwxMi4xOTMgMTkgMTQuMTI5IDIyLjc1NCAxNi4xNzUgMTkgMTguNDA0IDE5IDE1LjMzMyAyNCAxOC40NzQgMjkgMTYuMTIzIDI5IDE0LjAxMyAyNS4wNyAxMS45MTIgMjkgOS41MjYgMjkgMTIuNzE5IDIzLjk4MnoiLz48L3N2Zz4=" />
+                     <p href="/download/final_cleaned_data.csv" class="text-[8px] text-center underline underline-offset-1">cleaned_data.csv</p>
+                  </a>
+               </div>
+               <div style="background: rgba( 94, 122, 220, 0.5 );
+                     box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+                     backdrop-filter: blur( 9px );
+                     -webkit-backdrop-filter: blur( 9px );
+                     border-radius: 10px;
+                     border: 1px solid rgba( 255, 255, 255, 0.18 );"
+                  class="bg-[#1a1f2f] rounded-xl p-4 min-h-[120px] flex flex-col justify-center items-center space-y-2">
+                  <a href="/raw-data-analysis">
+                  <p class="text-sm font-normal mb-2">
+                     Raw Data Analysis
+                  </p>
+                  </a>
+                  <a href="/download/weatherAUS.csv" class="relative w-12 h-12">
+                     <img alt="svgImg"
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciICB2aWV3Qm94PSIwIDAgNDggNDgiIHdpZHRoPSI0OHB4IiBoZWlnaHQ9IjQ4cHgiPjxwYXRoIGZpbGw9IiM0Q0FGNTAiIGQ9Ik00MSwxMEgyNXYyOGgxNmMwLjU1MywwLDEtMC40NDcsMS0xVjExQzQyLDEwLjQ0Nyw0MS41NTMsMTAsNDEsMTB6Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTMyIDE1SDM5VjE4SDMyek0zMiAyNUgzOVYyOEgzMnpNMzIgMzBIMzlWMzNIMzJ6TTMyIDIwSDM5VjIzSDMyek0yNSAxNUgzMFYxOEgyNXpNMjUgMjVIMzBWMjhIMjV6TTI1IDMwSDMwVjMzSDI1ek0yNSAyMEgzMFYyM0gyNXoiLz48cGF0aCBmaWxsPSIjMkU3RDMyIiBkPSJNMjcgNDJMNiAzOCA2IDEwIDI3IDZ6Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTE5LjEyOSwzMWwtMi40MTEtNC41NjFjLTAuMDkyLTAuMTcxLTAuMTg2LTAuNDgzLTAuMjg0LTAuOTM4aC0wLjAzN2MtMC4wNDYsMC4yMTUtMC4xNTQsMC41NDEtMC4zMjQsMC45NzlMMTMuNjUyLDMxSDkuODk1bDQuNDYyLTcuMDAxTDEwLjI3NCwxN2gzLjgzN2wyLjAwMSw0LjE5NmMwLjE1NiwwLjMzMSwwLjI5NiwwLjcyNSwwLjQyLDEuMTc5aDAuMDRjMC4wNzgtMC4yNzEsMC4yMjQtMC42OCwwLjQzOS0xLjIyTDE5LjIzNywxN2gzLjUxNWwtNC4xOTksNi45MzlsNC4zMTYsNy4wNTloLTMuNzRWMzF6Ii8+PC9zdmc+" />
+                     <p href="/download/weatherAUS.csv"  class="text-[8px] text-center underline underline-offset-1">weatherAUS.csv</p>
+                  </a>
+               </div>
+            </div>
+            <!-- Report Generator -->
+            <div class="flex flex-col space-y-4">
+               <div class="flex justify-between items-center">
+                  <h3 class="text-lg font-normal px-6">
+                     Report Generator
+                  </h3>
+                  <!-- <button class="bg-[#1a1f2f] text-[#4b5563] text-xs rounded-full px-3 py-1">
+                        Show All
+                        </button> -->
+               </div>
+               <form action="/generated-graph" method="post">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-6 py-6">
+                     <div style="background: rgba( 94, 122, 220, 0.5 );
+                        box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+                        backdrop-filter: blur( 9px );
+                        -webkit-backdrop-filter: blur( 9px );
+                        border-radius: 10px;
+                        border: 1px solid rgba( 255, 255, 255, 0.18 );"
+                        class="bg-[#1a1f2f] rounded-xl p-6 flex justify-between items-center max-w-xs">
+                        <div>
+                           <div class="text-xl text-black font-semibold p-2">
+                              <select class="form-select rounded-2xl p-2" aria-label="Month" id="month" name="month">
+                                 <option selected>Month</option>
+                                 <option value="1">JAN</option>
+                                 <option value="2">FEB</option>
+                                 <option value="3">MAR</option>
+                                 <option value="4">APR</option>
+                                 <option value="5">MAY</option>
+                                 <option value="6">JUN</option>
+                                 <option value="7">JUL</option>
+                                 <option value="8">AUG</option>
+                                 <option value="9">SEP</option>
+                                 <option value="10">OCT</option>
+                                 <option value="11">NOV</option>
+                                 <option value="12">DEC</option>
+                              </select>
+                           </div>
+                           <p class="text-xs text-[#00184b] mt-1 px-2">
+                              <span class="ml-2">
+                                 JAN-DEC
+                              </span>
+                           </p>
+                        </div>
+                        <img alt="Sun behind cloud icon representing weather in USA" class="w-10 h-7" draggable="false"
+                           height="30"
+                           src="https://storage.googleapis.com/a1aa/image/ae0b01fe-0507-49a3-a04b-f39888cf6756.jpg"
+                           width="40" />
+                     </div>
+                     <div style="background: rgba( 94, 122, 220, 0.5 );
+                        box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+                        backdrop-filter: blur( 9px );
+                        -webkit-backdrop-filter: blur( 9px );
+                        border-radius: 10px;
+                        border: 1px solid rgba( 255, 255, 255, 0.18 );"
+                        class="bg-[#1a1f2f] rounded-xl p-6 flex justify-between                                     items-center max-w-xs">
+                        <div>
+                           <!-- OK -->
+                           <div class="text-xl text-black font-semibold p-2">
+                              <select class="form-select rounded-2xl p-2" aria-label="Year" id="year" name="year">
+                                 <option selected>Year</option>
+                                 <option value="2008">2008</option>
+                                 <option value="2009">2009</option>
+                                 <option value="2010">2010</option>
+                                 <option value="2011">2011</option>
+                                 <option value="2012">2012</option>
+                                 <option value="2013">2013</option>
+                                 <option value="2014">2014</option>
+                                 <option value="2015">2015</option>
+                                 <option value="2016">2016</option>
+                                 <option value="2017">2017</option>
+                              </select>
+                           </div>
+                           <p class="text-xs text-[#00184b] mt-1 px-2">
+                              <span class="ml-2">
+                                 2008-2017
+                              </span>
+                           </p>
+                        </div>
+                        <img alt="Sun behind cloud icon representing weather in Dubai UAE" class="w-10 h-7"
+                           draggable="false" height="30"
+                           src="https://storage.googleapis.com/a1aa/image/11e67acd-60d0-4b0e-6242-2504acfe41a2.jpg"
+                           width="40" />
+                     </div>
+                     <div style="background: rgba( 94, 122, 220, 0.5 );
+                        box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+                        backdrop-filter: blur( 9px );
+                        -webkit-backdrop-filter: blur( 9px );
+                        border-radius: 10px;
+                        border: 1px solid rgba( 255, 255, 255, 0.18 );"
+                        class="bg-[#1a1f2f] rounded-xl p-6 flex justify-between                                 items-center max-w-xs"
+                        class="bg-[#1a1f2f] rounded-xl p-6 flex justify-between items-center max-w-xs">
+                        <div>
+                           <div class="text-xl text-black font-semibold p-2">
+                              <select class="form-select rounded-2xl p-2" aria-label="parameter" id="parameter"
+                                 name="parameter">
+                                 <option selected>Parameter</option>
+                                 <option value="MinTemp">MinTemp</option>
+                                 <option value="MaxTemp">MaxTemp</option>
+                                 <option value="Rainfall">Rainfall</option>
+                                 <option value="Evaporation">Evaporation</option>
+                                 <option value="Sunshine">Sunshine</option>
+                                 <option value="WindGustSpeed">WindGustSpeed</option>
+                                 <option value="WindSpeed9am">WindSpeed9am</option>
+                                 <option value="WindSpeed3pm">WindSpeed3pm</option>
+                                 <option value="Humidity9am">Humidity9am</option>
+                                 <option value="Humidity3pm">Humidity3pm</option>
+                                 <option value="Pressure3pm">Pressure3pm</option>
+                                 <option value="Cloud9am">Cloud9am</option>
+                                 <option value="Cloud3pm">Cloud3pm</option>
+                                 <option value="Temp9am">Temp9am</option>
+                                 <option value="Temp3pm">Temp3pm</option>
+                              </select>
+                           </div>
+                           <p class="text-xs text-[#00184b] mt-1 px-2">
+                              <span class="ml-2">
+                                 Choose Parameter
+                              </span>
+                           </p>
+                        </div>
+                        <img alt="Sun behind cloud icon representing weather in China Nuevo" class="w-10 h-7"
+                           draggable="false" height="30"
+                           src="https://storage.googleapis.com/a1aa/image/db5cbdf6-3bcf-45a2-c940-635348aefb80.jpg"
+                           width="40" />
+                     </div>
+                     <button aria-label="Generate Button "
+                        class=" rounded-xl items-center space-x-2 bg-[#5c3ee8] text-white text-center text-sm font-medium mb-4 max-w-xs max-h-xs">
+                        <span class="text-3xl">
+                           Generate
+                        </span>
+                     </button>
+                  </div>
+               </form>
+            </div>
+         </div>
+      </section>
+   </main>
+   <script>
+      let willRain;
+      document.getElementById('predict_button').addEventListener('click', function (event) {
+         event.preventDefault();
+         const rainfall = document.getElementById('Rainfall').value;
+         const humidity3pm = document.getElementById('Humidity3pm').value;
+         const humidity9am = document.getElementById('Humidity9am').value;
+         const sunshine = document.getElementById('Sunshine').value;
+         const minTemp = document.getElementById('MinTemp').value;
+         const pressure9am = document.getElementById('Pressure9am').value;
+         const pressure3pm = document.getElementById('Pressure3pm').value;
+         const windGustSpeed = document.getElementById('WindGustSpeed').value;
+
+         fetch('http://127.0.0.1:5000/predict', {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+               Rainfall: rainfall,
+               Humidity3pm: humidity3pm,
+               Humidity9am: humidity9am,
+               Sunshine: sunshine,
+               MinTemp: minTemp,
+               Pressure9am: pressure9am,
+               Pressure3pm: pressure3pm,
+               WindGustSpeed: windGustSpeed
+            })
+         })
+            .then(response => {
+               if (!response.ok) {
+                  throw new Error('Network response was not OK');
+               }
+               return response.json();
+            })
+            .then(data => {
+               console.log('Server Response:', data);
+
+               const rainStatusDiv = document.getElementById('rainStatus');
+               console.log(typeof data.data)
+               if (data.data == 1) {
+                  willRain = true;
+                  rainStatusDiv.className = 'flex-1 bg-green-400 p-6 rounded-lg text-center text-lg font-medium';
+                  rainStatusDiv.textContent = 'It will rain 🌧️';
+               } else {
+                  willRain = false;
+                  rainStatusDiv.className = 'flex-1 bg-red-400 p-6 rounded-lg text-center text-lg font-medium';
+                  rainStatusDiv.textContent = 'No rain ☀️';
+               }
+            })
+            .catch(error => {
+               console.error('Error:', error);
+               alert('An error occurred. Check console for details.');
+            });
+      });
+
+   </script>
+
+   <script>
+      // Add navigation handler
+      function handleNavigation(page) {
+         const routes = {
+            dashboard: '/',
+            clean: '/cleaned-data-analysis',
+            raw: '/raw-data-analysis',
+            report: '/generate',
+            model: '/model-details',
+            documentation: '/documentation',
+            group: '/group'
+         };
+
+         if (routes[page]) {
+            window.location.href = routes[page];
+         }
+      }
+
+      // Attach click handlers
+      document.querySelectorAll('.icon-btn[data-page]').forEach(button => {
+         button.addEventListener('click', function () {
+            handleNavigation(this.dataset.page);
+         });
+      });
+   </script>
+</body>
+
+</html>
